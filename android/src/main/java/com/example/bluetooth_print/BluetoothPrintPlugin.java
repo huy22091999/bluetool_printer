@@ -509,10 +509,7 @@ public class BluetoothPrintPlugin implements FlutterPlugin, ActivityAware, Metho
     }
 
     if (args != null && args.containsKey("bytes")) {
-      byte[] byteArray = (byte[]) args.get("bytes");
-      if(list == null){
-        return;
-      }
+      final ArrayList<Integer> bytes = (ArrayList<Integer>)args.get("bytes");
 
       threadPool = ThreadPool.getInstantiation();
       threadPool.addSerialTask(new Runnable() {
@@ -521,11 +518,11 @@ public class BluetoothPrintPlugin implements FlutterPlugin, ActivityAware, Metho
           assert deviceConnFactoryManager != null;
 
           Vector<Byte> vectorData = new Vector<>();
-          for(int i = 0; i < byteArray.length; ++i) {
-            Integer val = Integer.valueOf(byteArray[i]);
+          for(int i = 0; i < bytes.size(); ++i) {
+            Integer val = bytes.get(i);
             vectorData.add(Byte.valueOf( Integer.toString(val > 127 ? val-256 : val ) ));
           }
-          deviceConnFactoryManager.sendByteDataImmediately(byteArray);
+          deviceConnFactoryManager.sendDataImmediately(vectorData);
 
         }
       });
