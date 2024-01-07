@@ -131,6 +131,29 @@
        result(e);
      }
   }
+  else if([@"writeData" isEqualToString:call.method]) {
+                  @try {
+                      NSDictionary *args = [call arguments];
+
+                      NSMutableArray *bytes = [args objectForKey:@"bytes"];
+
+                      NSNumber* lenBuf = [args objectForKey:@"length"];
+                      int len = [lenBuf intValue];
+                      char cArray[len];
+
+                      for (int i = 0; i < len; ++i) {
+           //               NSLog(@"** ind_%d (d): %@, %d", i, bytes[i], [bytes[i] charValue]);
+                          cArray[i] = [bytes[i] charValue];
+                      }
+                      NSData *data2 = [NSData dataWithBytes:cArray length:sizeof(cArray)];
+           //           NSLog(@"bytes in hex: %@", [data2 description]);
+                      [Manager write:data2];
+                      result(nil);
+                  } @catch(FlutterError *e) {
+                      result(e);
+                  }
+             }
+
 }
 
 -(NSData *)mapToTscCommand:(NSDictionary *) args {
@@ -236,28 +259,7 @@
             NSData *decodeData = [[NSData alloc] initWithBase64EncodedString:content options:0];
             UIImage *image = [UIImage imageWithData:decodeData];
             [command addOriginrastBitImage:image width:576];
-        }else if([@"writeData" isEqualToString:call.method]) {
-                @try {
-                    NSDictionary *args = [call arguments];
-
-                    NSMutableArray *bytes = [args objectForKey:@"bytes"];
-
-                    NSNumber* lenBuf = [args objectForKey:@"length"];
-                    int len = [lenBuf intValue];
-                    char cArray[len];
-
-                    for (int i = 0; i < len; ++i) {
-         //               NSLog(@"** ind_%d (d): %@, %d", i, bytes[i], [bytes[i] charValue]);
-                        cArray[i] = [bytes[i] charValue];
-                    }
-                    NSData *data2 = [NSData dataWithBytes:cArray length:sizeof(cArray)];
-         //           NSLog(@"bytes in hex: %@", [data2 description]);
-                    [Manager write:data2];
-                    result(nil);
-                } @catch(FlutterError *e) {
-                    result(e);
-                }
-           }
+        }
         
         if([linefeed isEqualToNumber:@1]){
             [command addPrintAndLineFeed];
